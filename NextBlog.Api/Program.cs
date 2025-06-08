@@ -1,3 +1,4 @@
+using NextBlog.Api.Database;
 using NextBlog.Api.Repositories;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -8,7 +9,8 @@ builder.Services.AddControllers();
 // Learn more about configuring OpenAPI at https://aka.ms/aspnet/openapi
 builder.Services.AddOpenApi();
 
-builder.Services.AddSingleton<IPostRepository, PostRepository>();
+builder.Services.AddScoped<IPostRepository, PostRepository>();
+builder.Services.AddDbContext<ApplicationDbContext>();
 
 var app = builder.Build();
 
