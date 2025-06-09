@@ -4,6 +4,7 @@ using NextBlog.Api.DTOs.Posts;
 using NextBlog.Api.Mapping;
 using NextBlog.Api.Models;
 using NextBlog.Api.Repositories;
+using NextBlog.Api.Services;
 
 namespace NextBlog.Api.Controllers
 {
@@ -11,11 +12,11 @@ namespace NextBlog.Api.Controllers
     [ApiController]
     public class PostsController : ControllerBase
     {
-        private readonly IPostRepository _postRepository;
+        private readonly IPostService _postService;
 
-        public PostsController(IPostRepository postRepository)
+        public PostsController(IPostService postService)
         {
-            _postRepository = postRepository;
+            _postService = postService;
         }
 
 
@@ -24,7 +25,7 @@ namespace NextBlog.Api.Controllers
         {
             var post = request.MapToPost();
 
-            await _postRepository.CreateAsync(post);
+            await _postService.CreateAsync(post);
             return CreatedAtAction(nameof(Get), new { id = post.Id }, post);
 
         }
@@ -32,7 +33,7 @@ namespace NextBlog.Api.Controllers
         [HttpGet("{id:Guid}")]
         public async Task<IActionResult> Get([FromRoute] Guid id)
         {
-            var post = await _postRepository.GetByIdAsync(id);
+            var post = await _postService.GetByIdAsync(id);
 
             if (post is null)
             {
@@ -46,7 +47,7 @@ namespace NextBlog.Api.Controllers
         [HttpGet]
         public async Task<IActionResult> GetAll()
         {
-            var posts = await _postRepository.GetAllAsync();
+            var posts = await _postService.GetAllAsync();
 
             var response = posts.MapToResponse();
             return Ok(response);
@@ -57,21 +58,21 @@ namespace NextBlog.Api.Controllers
         {
             var post = request.MapToPost(id);
 
-            var updated = await _postRepository.UpdateAsync(post);
+            var updatedPost = await _postService.UpdateAsync(post);
 
-            if (!updated)
+            if (updatedPost is null)
             {
                 return NotFound();
             }
 
-            var response = post.MapToResponse();
+            var response = updatedPost.MapToResponse();
             return Ok(response);
         }
 
         [HttpDelete("{id:Guid}")]
         public async Task<IActionResult> Delete([FromRoute] Guid id)
         {
-            var deleted = await _postRepository.DeleteByIdAsync(id);
+            var deleted = await _postService.DeleteByIdAsync(id);
 
             if (!deleted)
             {

@@ -1,5 +1,6 @@
 using NextBlog.Api.Database;
 using NextBlog.Api.Repositories;
+using NextBlog.Api.Services;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -10,6 +11,7 @@ builder.Services.AddControllers();
 builder.Services.AddOpenApi();
 
 builder.Services.AddScoped<IPostRepository, PostRepository>();
+builder.Services.AddScoped<IPostService, PostService>();
 builder.Services.AddDbContext<ApplicationDbContext>();
 
 var app = builder.Build();

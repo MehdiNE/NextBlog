@@ -33,6 +33,16 @@ namespace NextBlog.Api.Repositories
             return true;
         }
 
+        public async Task<bool> ExistsByIdAsync(Guid id)
+        {
+            var post = await _context.Posts.SingleOrDefaultAsync(post => post.Id == id);
+            if (post is null)
+            {
+                return false;
+            }
+            return true;
+        }
+
         public async Task<IEnumerable<Post>> GetAllAsync()
         {
             return await _context.Posts.ToListAsync();
