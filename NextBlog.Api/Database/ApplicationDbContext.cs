@@ -6,6 +6,7 @@ namespace NextBlog.Api.Database
     public sealed class ApplicationDbContext : DbContext
     {
         public DbSet<Post> Posts { get; set; }
+        public DbSet<Comment> Comments { get; set; }
 
         protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
         {
