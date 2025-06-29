@@ -18,6 +18,11 @@ namespace NextBlog.Api.Controllers
             _tokenProvider = tokenProvider;
         }
 
+        /// <summary>
+        /// Test
+        /// </summary>
+        /// <param name="request"></param>
+        /// <returns></returns>
         [HttpPost("register")]
         public async Task<ActionResult<AccessTokenDto>> Register([FromBody] RegisterRequest request)
         {
@@ -31,7 +36,7 @@ namespace NextBlog.Api.Controllers
 
             if (!registerResult.Succeeded)
             {
-                return BadRequest();
+                return BadRequest(registerResult);
             }
 
             var tokenRequest = new TokenRequest(user.Id, user.Email);
