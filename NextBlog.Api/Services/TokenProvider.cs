@@ -4,6 +4,7 @@ using Microsoft.IdentityModel.Tokens;
 using NextBlog.Api.DTOs.Auth;
 using NextBlog.Api.Settings;
 using System.Security.Claims;
+using System.Security.Cryptography;
 using System.Text;
 
 namespace NextBlog.Api.Services
@@ -44,9 +45,11 @@ namespace NextBlog.Api.Services
             return accessToken;
         }
 
-        private string GenerateRefreshToken()
+        private static string GenerateRefreshToken()
         {
-            return "";
+            byte[] randomBytes = RandomNumberGenerator.GetBytes(32);
+
+            return Convert.ToBase64String(randomBytes);
         }
     }
 }

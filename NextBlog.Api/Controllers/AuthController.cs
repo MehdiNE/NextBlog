@@ -1,8 +1,13 @@
 ﻿using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Options;
+using NextBlog.Api.Database;
 using NextBlog.Api.DTOs.Auth;
+using NextBlog.Api.Models;
 using NextBlog.Api.Services;
+using NextBlog.Api.Settings;
 
 namespace NextBlog.Api.Controllers
 {
@@ -12,10 +17,14 @@ namespace NextBlog.Api.Controllers
     {
         private readonly UserManager<IdentityUser> _userManager;
         private readonly TokenProvider _tokenProvider;
-        public AuthController(UserManager<IdentityUser> userManager, TokenProvider tokenProvider)
+        private readonly JwtAuthOptions _jwtAuthOptions;
+        private readonly ApplicationDbContext _context;
+        public AuthController(UserManager<IdentityUser> userManager, TokenProvider tokenProvider, IOptions<JwtAuthOptions> options, ApplicationDbContext context)
         {
             _userManager = userManager;
             _tokenProvider = tokenProvider;
+            _jwtAuthOptions = options.Value;
+            _context = context;
         }
 
         /// <summary>
@@ -42,6 +51,17 @@ namespace NextBlog.Api.Controllers
             var tokenRequest = new TokenRequest(user.Id, user.Email);
             var accessToken = _tokenProvider.Create(tokenRequest);
 
+            var refreshToken = new RefreshToken
+            {
+                Id = Guid.NewGuid(),
+                UserId = user.Id,
+                ExpiresAtUtc = DateTime.UtcNow.AddDays(_jwtAuthOptions.RefreshTokenExpirationInDays),
+                Token = accessToken.RefreshToken,
+            };
+
+            _context.RefreshToken.Add(refreshToken);
+            await _context.SaveChangesAsync();
+
             return Ok(accessToken);
         }
 
@@ -58,7 +78,47 @@ namespace NextBlog.Api.Controllers
             var tokenRequest = new TokenRequest(user.Id, user.Email!);
             var accessToken = _tokenProvider.Create(tokenRequest);
 
+            var refreshToken = new RefreshToken
+            {
+                Id = Guid.NewGuid(),
+                UserId = user.Id,
+                ExpiresAtUtc = DateTime.UtcNow.AddDays(_jwtAuthOptions.RefreshTokenExpirationInDays),
+                Token = accessToken.RefreshToken,
+            };
+
+            _context.RefreshToken.Add(refreshToken);
+            await _context.SaveChangesAsync();
+
             return Ok(accessToken);
+        }
+
+        [HttpPost("refresh")]
+        public async Task<ActionResult<AccessTokenDto>> Refresh([FromBody] RefreshTokenDto refreshTokenDto)
+        {
+            var refreshToken = await _context.RefreshToken
+                .Include(rt => rt.User)
+                .FirstOrDefaultAsync(rt => rt.Token == refreshTokenDto.RefreshToken);
+
+            if (refreshToken is null)
+            {
+                return Unauthorized();
+            }
+
+            if (refreshToken.ExpiresAtUtc < DateTime.UtcNow)
+            {
+                return Unauthorized();
+            }
+
+            var tokenRequest = new TokenRequest(refreshToken.User.Id, refreshToken.User.Email!);
+            var accessToken = _tokenProvider.Create(tokenRequest);
+
+            refreshToken.Token = accessToken.RefreshToken;
+            refreshToken.ExpiresAtUtc = DateTime.UtcNow.AddDays(_jwtAuthOptions.RefreshTokenExpirationInDays);
+
+            await _context.SaveChangesAsync();
+
+            return Ok(accessToken);
+
         }
     }
 }
