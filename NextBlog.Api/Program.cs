@@ -3,6 +3,7 @@ using Microsoft.AspNetCore.Identity;
 using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi.Models;
 using NextBlog.Api.Database;
+using NextBlog.Api.Models;
 using NextBlog.Api.Repositories;
 using NextBlog.Api.Services;
 using NextBlog.Api.Settings;
@@ -52,8 +53,10 @@ builder.Services.AddScoped<IPostRepository, PostRepository>();
 builder.Services.AddScoped<IPostService, PostService>();
 builder.Services.AddScoped<ICommentService, CommentService>();
 builder.Services.AddScoped<ICommentRepository, CommentRepository>();
+builder.Services.AddScoped<IFollowRepository, FollowRepository>();
+builder.Services.AddScoped<IFollowService, FollowService>();
 builder.Services.AddDbContext<ApplicationDbContext>();
-builder.Services.AddIdentity<IdentityUser, IdentityRole>()
+builder.Services.AddIdentity<ApplicationUser, IdentityRole>()
                     .AddEntityFrameworkStores<ApplicationDbContext>();
 builder.Services.AddTransient<TokenProvider>();
 
@@ -67,7 +70,7 @@ builder.Services.AddAuthentication(options =>
 })
     .AddJwtBearer(option =>
     {
-        option.TokenValidationParameters = new Microsoft.IdentityModel.Tokens.TokenValidationParameters
+        option.TokenValidationParameters = new TokenValidationParameters
         {
             ValidIssuer = jwtAuthOptions.Issuer,
             ValidAudience = jwtAuthOptions.Audience,

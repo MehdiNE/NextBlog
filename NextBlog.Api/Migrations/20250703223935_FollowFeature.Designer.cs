@@ -3,6 +3,7 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using NextBlog.Api.Database;
 
@@ -11,9 +12,11 @@ using NextBlog.Api.Database;
 namespace NextBlog.Api.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    partial class ApplicationDbContextModelSnapshot : ModelSnapshot
+    [Migration("20250703223935_FollowFeature")]
+    partial class FollowFeature
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -379,7 +382,7 @@ namespace NextBlog.Api.Migrations
                         .IsRequired();
 
                     b.HasOne("NextBlog.Api.Models.ApplicationUser", "Following")
-                        .WithMany("Follower")
+                        .WithMany("Followers")
                         .HasForeignKey("FollowingId")
                         .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
@@ -402,7 +405,7 @@ namespace NextBlog.Api.Migrations
 
             modelBuilder.Entity("NextBlog.Api.Models.ApplicationUser", b =>
                 {
-                    b.Navigation("Follower");
+                    b.Navigation("Followers");
 
                     b.Navigation("Following");
                 });

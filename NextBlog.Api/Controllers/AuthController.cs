@@ -15,11 +15,11 @@ namespace NextBlog.Api.Controllers
     [ApiController]
     public class AuthController : ControllerBase
     {
-        private readonly UserManager<IdentityUser> _userManager;
+        private readonly UserManager<ApplicationUser> _userManager;
         private readonly TokenProvider _tokenProvider;
         private readonly JwtAuthOptions _jwtAuthOptions;
         private readonly ApplicationDbContext _context;
-        public AuthController(UserManager<IdentityUser> userManager, TokenProvider tokenProvider, IOptions<JwtAuthOptions> options, ApplicationDbContext context)
+        public AuthController(UserManager<ApplicationUser> userManager, TokenProvider tokenProvider, IOptions<JwtAuthOptions> options, ApplicationDbContext context)
         {
             _userManager = userManager;
             _tokenProvider = tokenProvider;
@@ -35,7 +35,7 @@ namespace NextBlog.Api.Controllers
         [HttpPost("register")]
         public async Task<ActionResult<AccessTokenDto>> Register([FromBody] RegisterRequest request)
         {
-            var user = new IdentityUser
+            var user = new ApplicationUser
             {
                 UserName = request.Name,
                 Email = request.Email,

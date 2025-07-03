@@ -4,11 +4,12 @@ using NextBlog.Api.Models;
 
 namespace NextBlog.Api.Database
 {
-    public sealed class ApplicationDbContext : IdentityDbContext
+    public sealed class ApplicationDbContext : IdentityDbContext<ApplicationUser>
     {
         public DbSet<Post> Posts { get; set; }
         public DbSet<Comment> Comments { get; set; }
         public DbSet<RefreshToken> RefreshToken { get; set; }
+        public DbSet<Follow> Follow { get; set; }
 
         protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
         {
@@ -30,10 +31,25 @@ namespace NextBlog.Api.Database
                 .WithMany()
                 .HasForeignKey(x => x.UserId)
                 .OnDelete(DeleteBehavior.Cascade);
-
-
             }
             );
+
+            builder.Entity<Follow>()
+            .HasKey(f => new { f.FollowerId, f.FollowingId });
+
+            // Follower relationship
+            builder.Entity<Follow>()
+                .HasOne(f => f.Follower)
+                .WithMany(u => u.Following)
+                .HasForeignKey(f => f.FollowerId)
+                .OnDelete(DeleteBehavior.Restrict);
+
+            // Following relationship
+            builder.Entity<Follow>()
+                .HasOne(f => f.Following)
+                .WithMany(u => u.Follower)
+                .HasForeignKey(f => f.FollowingId)
+                .OnDelete(DeleteBehavior.Restrict);
 
             base.OnModelCreating(builder);
         }
