@@ -25,7 +25,7 @@ namespace NextBlog.Api.Services
 
             List<Claim> claims =
                 [
-                    new Claim(JwtRegisteredClaimNames.Sub, tokenRequest.UserId),
+                    new Claim("UserId", tokenRequest.UserId),
                     new Claim(JwtRegisteredClaimNames.Email, tokenRequest.Email),
                 ];
 

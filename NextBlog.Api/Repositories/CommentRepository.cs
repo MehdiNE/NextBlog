@@ -20,11 +20,12 @@ namespace NextBlog.Api.Repositories
             return true;
         }
 
-        public async Task<bool> DeleteByIdAsync(Guid postId, Guid commentId)
+        public async Task<bool> DeleteByIdAsync(Guid postId, Guid commentId, string userId)
         {
             var existingComment = await _context.Comments.SingleOrDefaultAsync(x => x.Id == commentId && x.PostId == postId);
 
             if (existingComment is null) return false;
+            if (existingComment.UserId != userId) return false;
 
             _context.Comments.Remove(existingComment);
             await _context.SaveChangesAsync();

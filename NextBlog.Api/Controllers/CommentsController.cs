@@ -1,5 +1,7 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Mvc;
 using NextBlog.Api.DTOs.Comments;
+using NextBlog.Api.Extensions;
 using NextBlog.Api.Models;
 using NextBlog.Api.Services;
 
@@ -17,14 +19,18 @@ namespace NextBlog.Api.Controllers
         }
 
         [HttpPost("posts/{postId:Guid}/comments")]
+        [Authorize]
         public async Task<IActionResult> Create([FromBody] CreateCommentRequest request, [FromRoute] Guid postId)
         {
+            string userId = User.GetUserId();
+
             var comment = new Comment
             {
                 Content = request.Content,
                 Id = Guid.NewGuid(),
                 CreatedAt = DateTime.UtcNow,
-                PostId = postId
+                PostId = postId,
+                UserId = userId
             };
 
             await _commentService.CreateAsync(comment);
@@ -39,9 +45,12 @@ namespace NextBlog.Api.Controllers
         }
 
         [HttpDelete("posts/{postId:Guid}/comments/{commentId:Guid}")]
+        [Authorize]
         public async Task<IActionResult> Delete([FromRoute] Guid postId, [FromRoute] Guid commentId)
         {
-            var isDeleted = await _commentService.DeleteByIdAsync(postId, commentId);
+            string userId = User.GetUserId();
+
+            var isDeleted = await _commentService.DeleteByIdAsync(postId, commentId, userId);
             if (!isDeleted)
             {
                 return NotFound();

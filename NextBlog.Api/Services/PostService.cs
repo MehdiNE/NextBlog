@@ -17,9 +17,9 @@ namespace NextBlog.Api.Services
             return await _postRepository.CreateAsync(post);
         }
 
-        public async Task<bool> DeleteByIdAsync(Guid id)
+        public async Task<bool> DeleteByIdAsync(Guid id, string userId)
         {
-            return await _postRepository.DeleteByIdAsync(id);
+            return await _postRepository.DeleteByIdAsync(id, userId);
         }
 
         public async Task<IEnumerable<Post>> GetAllAsync()

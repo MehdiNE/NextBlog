@@ -1,6 +1,8 @@
-﻿using Microsoft.AspNetCore.Http;
+﻿using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using NextBlog.Api.DTOs.Posts;
+using NextBlog.Api.Extensions;
 using NextBlog.Api.Mapping;
 using NextBlog.Api.Models;
 using NextBlog.Api.Repositories;
@@ -21,9 +23,11 @@ namespace NextBlog.Api.Controllers
 
 
         [HttpPost]
+        [Authorize]
         public async Task<IActionResult> Create([FromBody] CreatePostRequest request)
         {
-            var post = request.MapToPost();
+            string userId = User.GetUserId();
+            var post = request.MapToPost(userId);
 
             await _postService.CreateAsync(post);
             return CreatedAtAction(nameof(Get), new { id = post.Id }, post);
@@ -54,9 +58,11 @@ namespace NextBlog.Api.Controllers
         }
 
         [HttpPut("{id:Guid}")]
+        [Authorize]
         public async Task<IActionResult> Update([FromRoute] Guid id, [FromBody] UpdatePostRequest request)
         {
-            var post = request.MapToPost(id);
+            string userId = User.GetUserId();
+            var post = request.MapToPost(id, userId);
 
             var updatedPost = await _postService.UpdateAsync(post);
 
@@ -70,9 +76,11 @@ namespace NextBlog.Api.Controllers
         }
 
         [HttpDelete("{id:Guid}")]
+        [Authorize]
         public async Task<IActionResult> Delete([FromRoute] Guid id)
         {
-            var deleted = await _postService.DeleteByIdAsync(id);
+            string userId = User.GetUserId();
+            var deleted = await _postService.DeleteByIdAsync(id, userId);
 
             if (!deleted)
             {

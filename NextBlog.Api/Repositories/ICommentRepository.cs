@@ -7,6 +7,6 @@ namespace NextBlog.Api.Repositories
         Task<bool> CreateAsync(Comment comment);
         Task<Comment?> GetByIdAsync(Guid id);
         Task<IEnumerable<Comment>> GetAllAsync(Guid postId);
-        Task<bool> DeleteByIdAsync(Guid postId, Guid commentId);
+        Task<bool> DeleteByIdAsync(Guid postId, Guid commentId, string userId);
     }
 }

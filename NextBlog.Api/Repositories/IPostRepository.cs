@@ -8,7 +8,7 @@ namespace NextBlog.Api.Repositories
         Task<Post?> GetByIdAsync(Guid id);
         Task<IEnumerable<Post>> GetAllAsync();
         Task<bool> UpdateAsync(Post post);
-        Task<bool> DeleteByIdAsync(Guid id);
+        Task<bool> DeleteByIdAsync(Guid id, string userId);
         Task<bool> ExistsByIdAsync(Guid id);
     }
 }

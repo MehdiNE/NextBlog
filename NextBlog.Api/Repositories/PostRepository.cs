@@ -20,10 +20,15 @@ namespace NextBlog.Api.Repositories
             return true;
         }
 
-        public async Task<bool> DeleteByIdAsync(Guid id)
+        public async Task<bool> DeleteByIdAsync(Guid id, string userId)
         {
             var post = await _context.Posts.SingleOrDefaultAsync(p => p.Id == id);
             if (post is null)
+            {
+                return false;
+            }
+
+            if (userId != post.UserId)
             {
                 return false;
             }
@@ -59,6 +64,10 @@ namespace NextBlog.Api.Repositories
             var existingMovie = await _context.Posts.SingleOrDefaultAsync(x => x.Id == post.Id);
 
             if (existingMovie is null) return false;
+            if (existingMovie.UserId != post.UserId)
+            {
+                return false;
+            }
 
             existingMovie.Title = post.Title;
             existingMovie.Content = post.Content;

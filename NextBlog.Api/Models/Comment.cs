@@ -8,6 +8,9 @@
 
 
         public required Guid PostId { get; init; }
-        public Post Post { get; set; } = null!;
+        public Post? Post { get; set; }
+
+        public required string UserId { get; set; }
+        public ApplicationUser? User { get; set; }
     }
 }

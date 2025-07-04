@@ -8,6 +8,6 @@ namespace NextBlog.Api.Services
         Task<Post?> GetByIdAsync(Guid id);
         Task<IEnumerable<Post>> GetAllAsync();
         Task<Post?> UpdateAsync(Post post);
-        Task<bool> DeleteByIdAsync(Guid id);
+        Task<bool> DeleteByIdAsync(Guid id, string userId);
     }
 }
