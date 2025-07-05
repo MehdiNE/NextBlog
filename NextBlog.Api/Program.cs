@@ -3,6 +3,7 @@ using Microsoft.AspNetCore.Identity;
 using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi.Models;
 using NextBlog.Api.Database;
+using NextBlog.Api.Hubs;
 using NextBlog.Api.Models;
 using NextBlog.Api.Repositories;
 using NextBlog.Api.Repositories.Like;
@@ -17,7 +18,20 @@ var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
 
+builder.Services.AddCors(options =>
+{
+    options.AddPolicy(name: "myAppCorsPolicy",
+                      policy =>
+                      {
+                          policy.WithOrigins("http://localhost:5173") // Your frontend URL
+                                .AllowAnyHeader()
+                                .AllowAnyMethod()
+                                .AllowCredentials(); // Important for SignalR authentication
+                      });
+});
+
 builder.Services.AddControllers();
+builder.Services.AddSignalR();
 // Learn more about configuring OpenAPI at https://aka.ms/aspnet/openapi
 //builder.Services.AddOpenApi();
 builder.Services.AddSwaggerGen(options =>
@@ -100,12 +114,15 @@ if (app.Environment.IsDevelopment())
     });
 }
 
-app.UseHttpsRedirection();
 
+
+app.UseHttpsRedirection();
+app.UseCors("myAppCorsPolicy");
 app.UseAuthentication();
 app.UseAuthorization();
 
 
 app.MapControllers();
+app.MapHub<NotificationHub>("/notificationHub");
 
 app.Run();
