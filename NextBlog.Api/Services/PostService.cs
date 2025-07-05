@@ -1,4 +1,6 @@
-﻿using NextBlog.Api.Models;
+﻿using NextBlog.Api.DTOs;
+using NextBlog.Api.DTOs.Posts;
+using NextBlog.Api.Models;
 using NextBlog.Api.Repositories;
 
 namespace NextBlog.Api.Services
@@ -22,9 +24,9 @@ namespace NextBlog.Api.Services
             return await _postRepository.DeleteByIdAsync(id, userId);
         }
 
-        public async Task<IEnumerable<Post>> GetAllAsync()
+        public async Task<(IEnumerable<Post>, int totalCount)> GetAllAsync(PostFilterRequest filterRequest, PaginationRequest paginationRequest)
         {
-            return await _postRepository.GetAllAsync();
+            return await _postRepository.GetAllAsync(filterRequest, paginationRequest);
         }
 
         public async Task<Post?> GetByIdAsync(Guid id)

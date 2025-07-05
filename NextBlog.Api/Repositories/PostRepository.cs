@@ -1,5 +1,7 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using NextBlog.Api.Database;
+using NextBlog.Api.DTOs;
+using NextBlog.Api.DTOs.Posts;
 using NextBlog.Api.Models;
 
 namespace NextBlog.Api.Repositories
@@ -48,9 +50,29 @@ namespace NextBlog.Api.Repositories
             return true;
         }
 
-        public async Task<IEnumerable<Post>> GetAllAsync()
+        public async Task<(IEnumerable<Post>, int totalCount)> GetAllAsync(PostFilterRequest filterRequest, PaginationRequest paginationRequest)
         {
-            return await _context.Posts.ToListAsync();
+            var query = _context.Posts.AsQueryable();
+
+            if (!string.IsNullOrEmpty(filterRequest.Title))
+            {
+                query = query.Where(p => p.Title.Contains(filterRequest.Title));
+            }
+
+            if (!string.IsNullOrEmpty(filterRequest.Content))
+            {
+                query = query.Where(p => p.Content.Contains(filterRequest.Content));
+            }
+
+            var posts = await query
+                .Skip((paginationRequest.PageNumber - 1) * paginationRequest.PageSize)
+                .Take(paginationRequest.PageSize)
+                .ToListAsync();
+
+            var totalCount = await query.CountAsync();
+
+            return (posts, totalCount);
+
         }
 
         public async Task<Post?> GetByIdAsync(Guid id)

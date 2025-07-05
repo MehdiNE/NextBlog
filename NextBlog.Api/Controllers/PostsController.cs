@@ -1,6 +1,7 @@
 ﻿using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using NextBlog.Api.DTOs;
 using NextBlog.Api.DTOs.Posts;
 using NextBlog.Api.Extensions;
 using NextBlog.Api.Mapping;
@@ -49,11 +50,11 @@ namespace NextBlog.Api.Controllers
         }
 
         [HttpGet]
-        public async Task<IActionResult> GetAll()
+        public async Task<ActionResult<PostsResponse>> GetAll([FromQuery] PostFilterRequest filterRequest, [FromQuery] PaginationRequest paginationRequest)
         {
-            var posts = await _postService.GetAllAsync();
+            var (posts, totalCount) = await _postService.GetAllAsync(filterRequest, paginationRequest);
 
-            var response = posts.MapToResponse();
+            var response = posts.MapToResponse(totalCount);
             return Ok(response);
         }
 

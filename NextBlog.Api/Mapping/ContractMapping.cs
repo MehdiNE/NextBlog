@@ -27,11 +27,13 @@ namespace NextBlog.Api.Mapping
 
         }
 
-        public static PostsResponse MapToResponse(this IEnumerable<Post> posts)
+        public static PostsResponse MapToResponse(this IEnumerable<Post> posts, int totalCount)
         {
             return new PostsResponse
             {
                 Items = posts.Select(p => p.MapToResponse()),
+                TotalCount = totalCount
+
             };
         }
 
