@@ -1,6 +1,7 @@
 ﻿using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;
 using NextBlog.Api.Models;
+using System.Reflection.Emit;
 
 namespace NextBlog.Api.Database
 {
@@ -10,6 +11,7 @@ namespace NextBlog.Api.Database
         public DbSet<Comment> Comments { get; set; }
         public DbSet<RefreshToken> RefreshToken { get; set; }
         public DbSet<Follow> Follow { get; set; }
+        public DbSet<PostLike> PostLike { get; set; }
 
         protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
         {
@@ -67,6 +69,26 @@ namespace NextBlog.Api.Database
             builder.Entity<Comment>()
                 .HasOne(x => x.User)
                 .WithMany(x => x.Comments)
+                .HasForeignKey(x => x.UserId)
+                .OnDelete(DeleteBehavior.Restrict);
+
+            // Post like
+            builder.Entity<PostLike>()
+                 .HasKey(pl => pl.Id);
+
+            // 2. Add a unique index to prevent duplicate likes
+            builder.Entity<PostLike>()
+                .HasIndex(pl => new { pl.UserId, pl.PostId })
+                .IsUnique();
+
+            builder.Entity<PostLike>()
+                .HasOne(x => x.Post)
+                .WithMany(x => x.PostLikes)
+                .HasForeignKey(x => x.PostId);
+
+            builder.Entity<PostLike>()
+                .HasOne(x => x.User)
+                .WithMany(x => x.PostLikes)
                 .HasForeignKey(x => x.UserId)
                 .OnDelete(DeleteBehavior.Restrict);
 

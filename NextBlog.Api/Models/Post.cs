@@ -8,5 +8,6 @@
         public required string UserId { get; set; }
         public ApplicationUser? User { get; set; }
         public ICollection<Comment> Comments { get; set; } = [];
+        public ICollection<PostLike> PostLikes { get; set; } = [];
     }
 }

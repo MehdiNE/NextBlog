@@ -5,7 +5,9 @@ using Microsoft.OpenApi.Models;
 using NextBlog.Api.Database;
 using NextBlog.Api.Models;
 using NextBlog.Api.Repositories;
+using NextBlog.Api.Repositories.Like;
 using NextBlog.Api.Services;
+using NextBlog.Api.Services.Like;
 using NextBlog.Api.Settings;
 using Scalar.AspNetCore;
 using System.Reflection;
@@ -55,6 +57,8 @@ builder.Services.AddScoped<ICommentService, CommentService>();
 builder.Services.AddScoped<ICommentRepository, CommentRepository>();
 builder.Services.AddScoped<IFollowRepository, FollowRepository>();
 builder.Services.AddScoped<IFollowService, FollowService>();
+builder.Services.AddScoped<ILikeService, LikeService>();
+builder.Services.AddScoped<ILikeRepository, LikeRepository>();
 builder.Services.AddDbContext<ApplicationDbContext>();
 builder.Services.AddIdentity<ApplicationUser, IdentityRole>()
                     .AddEntityFrameworkStores<ApplicationDbContext>();
